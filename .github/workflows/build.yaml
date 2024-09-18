@@ -22,11 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          bazel build //:for_all_platforms
+          bazel build //:for_all_unix_platforms
           mv bazel-out/darwin_arm64-opt/bin/external/libarchive\~/tar/bsdtar tar_darwin_arm64
           mv bazel-out/darwin_amd64-opt/bin/external/libarchive\~/tar/bsdtar tar_darwin_amd64
           mv bazel-out/linux_arm64_musl-opt/bin/external/libarchive\~/tar/bsdtar tar_linux_arm64
-          mv bazel-bin/external/libarchive\~/tar/bsdtar tar_linux_amd64
+          mv bazel-out/linux_amd64_musl-opt/bin/external/libarchive\~/tar/bsdtar tar_linux_amd64
       - uses: actions/upload-artifact@v4
         id: upload
         with:
@@ -45,11 +45,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          bazel build @libarchive//tar
-          mv bazel-bin/external/libarchive~/tar/bsdtar tar_windows_amd64.exe
+          bazel build //:for_all_windows_platforms
+          mv bazel-out/windows_arm64-opt/bin/external/libarchive\~/tar/bsdtar tar_windows_arm64.exe
+          mv bazel-out/windows_amd64-opt/bin/external/libarchive\~/tar/bsdtar tar_windows_amd64.exe
       - uses: actions/upload-artifact@v4
         id: upload
         with:
           name: windows
           retention-days: 1
-          path: tar_windows_amd64.exe
+          path: |
+            tar_windows_arm64.exe
+            tar_windows_amd64.exe

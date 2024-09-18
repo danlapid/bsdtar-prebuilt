@@ -1,6 +1,11 @@
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
-PLATFORMS = [
+WINDOWS_PLATFORMS = [
+    "@zig_sdk//platform:windows_amd64",
+    "@zig_sdk//platform:windows_arm64",
+]
+
+UNIX_PLATFORMS = [
     "@zig_sdk//platform:darwin_amd64",
     "@zig_sdk//platform:darwin_arm64",
     "@zig_sdk//libc_aware/platform:linux_arm64_musl",
@@ -13,10 +18,25 @@ PLATFORMS = [
         srcs = ["@libarchive//tar"],
         target_platform = platform,
     )
-    for platform in PLATFORMS
+    for platform in UNIX_PLATFORMS
 ]
 
+[
+    platform_transition_filegroup(
+        name = "for_" + platform.split(":")[1],
+        srcs = ["@libarchive//tar"],
+        target_platform = platform,
+    )
+    for platform in WINDOWS_PLATFORMS
+]
+
+
 filegroup(
-    name = "for_all_platforms",
-    srcs = ["for_" + platform.split(":")[1] for platform in PLATFORMS],
+    name = "for_all_windows_platforms",
+    srcs = ["for_" + platform.split(":")[1] for platform in WINDOWS_PLATFORMS],
+)
+
+filegroup(
+    name = "for_all_unix_platforms",
+    srcs = ["for_" + platform.split(":")[1] for platform in UNIX_PLATFORMS],
 )
